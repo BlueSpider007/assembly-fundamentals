@@ -16,6 +16,25 @@ _start:
     mov rdx, 64             ; room for up to 64 bytes
     syscall
     ; TODO: print the greeting (see the exercise), then fall through to exit
+    mov rbx, rax
+    dec rbx
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, hello
+    mov rdx, hello_len
+    syscall
+
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, name
+    mov rdx, rbx
+    syscall
+
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, bang
+    mov rdx, bang_len
+    syscall
 
     mov rax, 60             ; exit
     xor rdi, rdi
