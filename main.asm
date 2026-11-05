@@ -10,12 +10,14 @@ _start:
     mov rsi, line
     mov rdx, 128
     syscall                 ; rax = number of bytes read
-
     ; TODO: put the reversed text and a newline into `rev`, then write it
+    cmp byte [line + rax - 1], 10
+    jne .no_newline
+    dec rax
 
-    xor rbx, rbx
+.no_newline:
     mov r12, rax
-    inc rbx
+    xor rbx, rbx
 .loop:
     cmp rbx, r12
     je .end ;set up the loop
@@ -30,12 +32,13 @@ _start:
     inc rbx
     jmp .loop
 .end:
-    mov [rev + rax], 10
+    mov byte [rev + r12], 10
 
     mov rax, 1
     mov rdi, 1
     mov rsi, rev
     mov rdx, r12
+    inc rdx
     syscall
 
     mov rax, 60
