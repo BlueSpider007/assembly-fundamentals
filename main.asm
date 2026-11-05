@@ -1,48 +1,42 @@
-section .data
-    star db "*"
-    nl db 10
-
 section .bss
-    inbuf resb 2            ; the digit and the newline
+    line resb 128           ; what we read
+    rev resb 128            ; room for the result
 
 section .text
     global _start
 _start:
-    mov rax, 0              ; read
+    mov rax, 0              ; read up to 128 bytes from stdin
     mov rdi, 0
-    mov rsi, inbuf
-    mov rdx, 2
-    syscall
-    movzx r12, byte [inbuf]
-    sub r12, '0'            ; r12 = N, the number of rows
-    mov rbx, 1
+    mov rsi, line
+    mov rdx, 128
+    syscall                 ; rax = number of bytes read
 
-    ; TODO: print the staircase. Two nested loops; remember that `syscall`
-    ;       overwrites rcx and r11, so keep your counters elsewhere.
-.outer:
-    cmp rbx, r12
-    ja .done
-    lea r15, [rbx]
-.inner:
-    cmp r15, 0
-    je .next
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, star
-    mov rdx, 1
-    syscall
-    dec r15
-    jmp .inner
-.next:
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, nl
-    mov rdx, 1
-    syscall
+    ; TODO: put the reversed text and a newline into `rev`, then write it
+
+    xor rbx, rbx
+    mov r12, rax
     inc rbx
-    jmp .outer
-.done:
+.loop:
+    cmp rbx, r12
+    je .end ;set up the loop
 
+    mov rcx, r12
+    dec rcx
+    sub rcx, rbx
+
+    mov al, [line + rcx]
+    mov [rev + rbx], al
+
+    inc rbx
+    jmp .loop
+.end:
+    mov [rev + rax], 10
+
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, rev
+    mov rdx, r12
+    syscall
 
     mov rax, 60
     xor rdi, rdi
